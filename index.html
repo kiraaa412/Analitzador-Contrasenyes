@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analitzador de contrasenyes</title>
+    <style>
+        :root {
+            --color-verde: #232C33;
+            --color-verde-claro: #232C33;
+            --color-amarillo: #232C33;
+            --color-naranja: #232C33;
+            --color-rojo: #232C33;
+            --color-gris: #DADFF7;
+            --color-texto: #000000;
+            --color-borde: #A0C1D1;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #DADFF7;
+            color: var(--color-texto);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 950px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #232C33;
+            margin-bottom: 10px;
+        }
+        
+        .description {
+            color: #B5B2C2;
+            font-size: 1.1rem;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        input[type="password"], input[type="text"], select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--color-borde);
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        .btn-generate {
+            background-color: #5A7D7C;
+        }
+        
+        .btn-generate:hover {
+            background-color: #5A7D7C;
+        }
+        
+        .btn-secondary {
+            background-color: #95a5a6;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #7f8c8d;
+        }
+        
+        .result-section {
+            display: none;
+        }
+        
+        .score-display {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .score-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .score-bar {
+            height: 20px;
+            background-color: var(--color-gris);
+            border-radius: 10px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+        
+        .score-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.5s ease-in-out;
+        }
+        
+        .score-label {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: center;
+        }
+        
+        .feature-icon {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .check {
+            color: var(--color-verde);
+        }
+        
+        .cross {
+            color: var(--color-rojo);
+        }
+        
+        .warning {
+            color: var(--color-naranja);
+        }
+        
+        .info-section {
+            margin: 20px 0;
+        }
+        
+        .info-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .info-title i {
+            margin-right: 8px;
+        }
+        
+        .info-content {
+            background-color: var(--color-gris);
+            padding: 15px;
+            border-radius: 4px;
+        }
+        
+        .recommendations-list {
+            list-style-type: none;
+        }
+        
+        .recommendations-list li {
+            margin-bottom: 10px;
+            padding-left: 20px;
+            position: relative;
+        }
+        
+        .recommendations-list li:before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #3498db;
+        }
+        
+        .password-display {
+            font-family: monospace;
+            font-size: 1.2rem;
+            padding: 10px;
+            background-color: var(--color-gris);
+            border-radius: 4px;
+            text-align: center;
+            margin: 15px 0;
+            word-break: break-all;
+        }
+        
+        .copy-btn {
+            background-color: #9b59b6;
+            margin-top: 10px;
+        }
+        
+        .copy-btn:hover {
+            background-color: #8e44ad;
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--color-borde);
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .tab.active {
+            border-bottom: 3px solid #3498db;
+            font-weight: 600;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .tab {
+                border-bottom: 1px solid var(--color-borde);
+                border-left: 3px solid transparent;
+            }
+            
+            .tab.active {
+                border-bottom: 1px solid var(--color-borde);
+                border-left: 3px solid #3498db;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>𝐀𝐍𝐀𝐋𝐈𝐓𝐙𝐀𝐃𝐎𝐑 𝐃𝐄 𝐂𝐎𝐍𝐓𝐑𝐀𝐒𝐄𝐍𝐘𝐄𝐒</h1>
+            <p class="description">Analitza la seguretat de les teves contrasenyes.</p>
+        </header>
+        
+        <div class="card">
+            <div class="tabs">
+                <div class="tab active" data-tab="analyze">Analitzar contrasenya</div>
+                <div class="tab" data-tab="generate">Generar contrasenya</div>
+            </div>
+            
+            <div class="tab-content active" id="analyze-tab">
+                <div class="input-group">
+                    <label for="password-input">Introdueix la contrasenya:</label>
+                    <input type="password" id="password-input" placeholder="Escribe tu contraseña aquí">
+                </div>
+                <button id="analyze-btn">Analitzar</button>
+            </div>
+            
+            <div class="tab-content" id="generate-tab">
+                <div class="input-group">
+                    <label for="password-length">Longitud:</label>
+                    <input type="number" id="password-length" min="8" max="50" value="16">
+                </div>
+                <div class="input-group">
+                    <label for="include-symbols">Incloure símbols:</label>
+                    <select id="include-symbols">
+                        <option value="yes">Si</option>
+                        <option value="no">No</option>
+                    </select>
+                </div>
+                <button id="generate-btn" class="btn-generate">Generar contrasenya segura</button>
+                
+                <div id="generated-password" style="display: none;">
+                    <div class="password-display" id="password-display"></div>
+                    <button id="copy-btn" class="copy-btn">Copiar contrasenya</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card result-section" id="result-section">
+            <div class="score-display">
+                <div class="score-value" id="score-value">0/100</div>
+                <div class="score-label" id="score-label">Molt feble</div>
+                <div class="score-bar">
+                    <div class="score-fill" id="score-fill" style="width: 0%; background-color: var(--color-rojo);"></div>
+                </div>
+            </div>
+            
+            <div class="info-section">
+                <div class="info-title">
+                    <i>📊</i> 𝗖𝗔𝗥𝗔𝗖𝗧𝗘𝗥Í𝗦𝗧𝗜𝗤𝗨𝗘𝗦
+                </div>
+                <div class="features-grid" id="features-grid">
+                    <!-- Se llenará dinámicamente -->
+                </div>
+            </div>
+            
+            <div class="info-section" id="patterns-section" style="display: none;">
+                <div class="info-title">
+                    <i>⚠️</i> 𝗣𝗔𝗧𝗥𝗢𝗡𝗦 𝗗𝗘𝗧𝗘𝗖𝗧𝗔𝗧𝗦
+                </div>
+                <div class="info-content" id="patterns-content">
+                    <!-- Se llenará dinámicamente -->
+                </div>
+            </div>
+            
+            <div class="info-section">
+                <div class="info-title">
+                    <i>🔍</i> 𝗔𝗧𝗔𝗖 𝗗𝗘 𝗗𝗜𝗖𝗖𝗜𝗢𝗡𝗔𝗥𝗜
+                </div>
+                <div class="info-content" id="dictionary-content">
+                    <!-- Se llenará dinámicamente -->
+                </div>
+            </div>
+            
+            <div class="info-section">
+                <div class="info-title">
+                    <i>💪</i> 𝗙𝗢𝗥Ç𝗔 𝗕𝗥𝗨𝗧𝗔
+                </div>
+                <div class="info-content" id="bruteforce-content">
+                    <!-- Se llenará dinámicamente -->
+                </div>
+            </div>
+            
+            <div class="info-section">
+                <div class="info-title">
+                    <i>💡</i> 𝗥𝗘𝗖𝗢𝗠𝗔𝗡𝗔𝗖𝗜𝗢𝗡𝗦
+                </div>
+                <div class="info-content">
+                    <ul class="recommendations-list" id="recommendations-list">
+                        <!-- Se llenará dinámicamente -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Analitzador de Contrasenyes &copy; 2025 - Kiran Dip </p>
+        </footer>
+    </div>
+
+    <script>
+        // Elementos DOM
+        const passwordInput = document.getElementById('password-input');
+        const analyzeBtn = document.getElementById('analyze-btn');
+        const generateBtn = document.getElementById('generate-btn');
+        const resultSection = document.getElementById('result-section');
+        const scoreValue = document.getElementById('score-value');
+        const scoreLabel = document.getElementById('score-label');
+        const scoreFill = document.getElementById('score-fill');
+        const featuresGrid = document.getElementById('features-grid');
+        const patternsSection = document.getElementById('patterns-section');
+        const patternsContent = document.getElementById('patterns-content');
+        const dictionaryContent = document.getElementById('dictionary-content');
+        const bruteforceContent = document.getElementById('bruteforce-content');
+        const recommendationsList = document.getElementById('recommendations-list');
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const passwordDisplay = document.getElementById('password-display');
+        const generatedPasswordSection = document.getElementById('generated-password');
+        const copyBtn = document.getElementById('copy-btn');
+        
+        // Lista de contraseñas comunes
+        const commonPasswords = [
+            "123456", "password", "12345678", "qwerty", "123456789",
+            "12345", "1234", "111111", "1234567", "dragon",
+            "123123", "baseball", "iloveyou", "trustno1", "1234567890",
+            "superman", "qwertyuiop", "1q2w3e4r", "admin", "welcome",
+            "monkey", "login", "abc123", "starwars", "123qwe",
+            "football", "master", "666666", "shadow", "michael",
+            "jennifer", "111111", "jordan", "qwerty123", "123321",
+            "password1", "654321", "letmein", "sunshine", "princess",
+            "solo", "ashley", "bailey", "passw0rd", "shadow",
+            "123456a", "password123", "qwerty1", "secret", "Password1",
+            "hola123", "futbol", "basket", "banana", "chocolate",
+            "amor", "familia", "contraseña", "bienvenido", "usuario",
+            "admin123", "root", "toor", "pass", "test",
+            "guest", "info", "adm", "mysql", "user",
+            "administrator", "oracle", "ftp", "pi", "puppet",
+            "ansible", "ec2-user", "vagrant", "azureuser", "demo",
+            "minecraft", "cookie", "naruto", "pokemon", "tigger",
+            "rosebud", "killer", "batman", "trustno1", "thomas"
+        ];
+        
+        // Patrones de teclado
+        const keyboardPatterns = [
+            "qwerty", "asdfgh", "zxcvbn", "qwertyuiop", "asdfghjkl",
+            "zxcvbnm", "1qaz2wsx", "qazwsx", "123qwe", "1q2w3e"
+        ];
+        
+        // Palabras comunes
+        const commonWords = [
+            "password", "contraseña", "pass", "admin", "user", "login",
+            "welcome", "hola", "amor", "familia", "nombre", "date"
+        ];
+        
+        // Velocidades de ataque
+        const attackSpeeds = {
+            '→ CPU normal': 1000000,
+            '→ GPU gaming': 1000000000,
+            '→ GPU professional': 10000000000,
+            '→ Cluster potent': 100000000000
+        };
+        
+        // Funciones de análisis
+        function detectPatterns(password) {
+            const problems = [];
+            
+            // Secuencias numéricas
+            if (/012|123|234|345|456|567|678|789|890/.test(password)) {
+                problems.push("Conté seqüències numèriques");
+            }
+            
+            // Secuencias alfabéticas
+            if (/abc|bcd|cde|def|efg|fgh|ghi|hij|ijk|jkl|klm|lmn|mno|nop|opq|pqr|qrs|rst|stu|tuv|uvw|vwx|wxy|xyz/.test(password.toLowerCase())) {
+                problems.push("Conté seqüències alfabètiques");
+            }
+            
+            // Caracteres repetidos
+            if (/(.)\1{2,}/.test(password)) {
+                problems.push("Conté caràcters repetits (aaa, 111)");
+            }
+            
+            // Patrones de teclado
+            for (const pattern of keyboardPatterns) {
+                if (password.toLowerCase().includes(pattern)) {
+                    problems.push(`Conté patró de teclat: ${pattern}`);
+                    break;
+                }
+            }
+            
+            // Sustituciones comunes
+            const substitutions = {'@': 'a', '3': 'e', '1': 'i', '0': 'o', '5': 's', '7': 't', '8': 'b'};
+            let substitutedPassword = password.toLowerCase();
+            for (const [symbol, letter] of Object.entries(substitutions)) {
+                substitutedPassword = substitutedPassword.replace(new RegExp(symbol, 'g'), letter);
+            }
+            
+            for (const word of commonWords) {
+                if (substitutedPassword.includes(word)) {
+                    problems.push(`Conté paraula comuna: ${word}`);
+                    break;
+                }
+            }
+            
+            // Fechas comunes
+            if (/19\d{2}|20\d{2}/.test(password)) {
+                problems.push("Conté possibles dates (any)");
+            }
+            
+            return {
+                hasPatterns: problems.length > 0,
+                problems: problems
+            };
+        }
+        
+        function calculateEntropy(password) {
+            let alphabetSize = 0;
+            if (/[a-z]/.test(password)) alphabetSize += 26;
+            if (/[A-Z]/.test(password)) alphabetSize += 26;
+            if (/[0-9]/.test(password)) alphabetSize += 10;
+            if (/[^a-zA-Z0-9]/.test(password)) alphabetSize += 32;
+            
+            if (alphabetSize === 0) return 0;
+            
+            // Entropía = log2(alfabeto^longitud)
+            let entropy = password.length * Math.log2(alphabetSize);
+            
+            // Penalización por caracteres repetidos
+            const charCount = {};
+            for (const char of password) {
+                charCount[char] = (charCount[char] || 0) + 1;
+            }
+            
+            const maxCount = Math.max(...Object.values(charCount));
+            if (maxCount > password.length * 0.3) {
+                entropy *= 0.7; // Reducir entropía si hay muchos caracteres repetidos
+            }
+            
+            return entropy;
+        }
+        
+        function checkDictionary(password) {
+            const startTime = performance.now();
+            const passwordLower = password.toLowerCase();
+            
+            // Comprobar contraseña exacta
+            if (commonPasswords.includes(passwordLower)) {
+                return {
+                    found: true,
+                    attempts: commonPasswords.indexOf(passwordLower) + 1,
+                    time: performance.now() - startTime,
+                    method: 'Contraseña común (exacta)'
+                };
+            }
+            
+            // Comprobar variaciones
+            const variants = [];
+            for (let i = 0; i < 100; i++) {
+                variants.push(passwordLower + i);
+                variants.push(i + passwordLower);
+            }
+            
+            // Variaciones con símbolos
+            const symbols = ['!', '@', '#', '$', '123', '!'];
+            for (const symbol of symbols) {
+                variants.push(passwordLower + symbol);
+            }
+            
+            // Comprobar variaciones
+            for (const variant of variants) {
+                if (commonPasswords.includes(variant)) {
+                    return {
+                        found: true,
+                        attempts: variants.length,
+                        time: performance.now() - startTime,
+                        method: 'Variació de contrasenya comuna'
+                    };
+                }
+            }
+            
+            return {
+                found: false,
+                attempts: variants.length + commonPasswords.length,
+                time: performance.now() - startTime,
+                method: 'No encontrada en el diccionario'
+            };
+        }
+        
+        function calculateBruteForceTime(password) {
+            let alphabetSize = 0;
+            if (/[a-z]/.test(password)) alphabetSize += 26;
+            if (/[A-Z]/.test(password)) alphabetSize += 26;
+            if (/[0-9]/.test(password)) alphabetSize += 10;
+            if (/[^a-zA-Z0-9]/.test(password)) alphabetSize += 32;
+            
+            const combinations = Math.pow(alphabetSize, password.length);
+            
+            const times = {};
+            for (const [device, speed] of Object.entries(attackSpeeds)) {
+                const seconds = combinations / (2 * speed);
+                times[device] = formatTime(seconds);
+            }
+            
+            return {
+                combinations: combinations,
+                alphabetSize: alphabetSize,
+                estimatedTime: times
+            };
+        }
+        
+        function formatTime(seconds) {
+            if (seconds < 0.001) {
+                return "Immediatament";
+            } else if (seconds < 1) {
+                return `${(seconds * 1000).toFixed(2)} milisegundos`;
+            } else if (seconds < 60) {
+                return `${seconds.toFixed(2)} segons`;
+            } else if (seconds < 3600) {
+                return `${(seconds / 60).toFixed(2)} minuts`;
+            } else if (seconds < 86400) {
+                return `${(seconds / 3600).toFixed(2)} hores`;
+            } else if (seconds < 31536000) {
+                return `${(seconds / 86400).toFixed(2)} dies`;
+            } else if (seconds < 31536000 * 100) {
+                return `${(seconds / 31536000).toFixed(0)} anys`;
+            } else if (seconds < 31536000 * 1000000) {
+                return `${(seconds / (31536000 * 1000)).toFixed(0)} milers d'anys`;
+            } else if (seconds < 31536000 * 1000000000) {
+                return `${(seconds / (31536000 * 1000000)).toFixed(0)} milions d'anys`;
+            } else {
+                return "Més de mil milions d'anys";
+            }
+        }
+        
+        function calculateScore(password, result) {
+            let score = 0;
+            
+            // Longitud (max 30 puntos)
+            const length = password.length;
+            if (length >= 16) {
+                score += 30;
+            } else if (length >= 12) {
+                score += 25;
+            } else if (length >= 8) {
+                score += 15;
+            } else if (length >= 6) {
+                score += 5;
+            }
+            
+            // Complejidad (max 30 puntos)
+            let complexity = 0;
+            if (result.hasLowercase) complexity += 5;
+            if (result.hasUppercase) complexity += 10;
+            if (result.hasNumbers) complexity += 7;
+            if (result.hasSymbols) complexity += 8;
+            score += complexity;
+            
+            // Entropía (max 20 puntos)
+            const entropy = result.entropy;
+            if (entropy >= 80) {
+                score += 20;
+            } else if (entropy >= 60) {
+                score += 15;
+            } else if (entropy >= 40) {
+                score += 10;
+            } else if (entropy >= 20) {
+                score += 5;
+            }
+            
+            // Penalizaciones
+            if (result.dictionaryAttack.found) {
+                score -= 50; // Grave
+            }
+            
+            if (result.patterns.hasPatterns) {
+                score -= result.patterns.problems.length * 5;
+            }
+            
+            // Asegurar rango 0-100
+            score = Math.max(0, Math.min(100, score));
+            
+            // Determinar nivel
+            let level, color;
+            if (score >= 80) {
+                level = "Molt fort";
+                color = "#4CAF50";
+            } else if (score >= 60) {
+                level = "Fort";
+                color = "#8BC34A";
+            } else if (score >= 40) {
+                level = "Mitjà";
+                color = "#FFC107";
+            } else if (score >= 20) {
+                level = "Feble";
+                color = "#FF9800";
+            } else {
+                level = "Molt feble";
+                color = "#F44336";
+            }
+            
+            return {
+                score: score,
+                level: level,
+                color: color
+            };
+        }
+        
+        function generateRecommendations(password, result) {
+            const recommendations = [];
+            
+            if (password.length < 12) {
+                recommendations.push(`Augmenta la longitud a almenys 12 caràcters (actual: ${password.length})`);
+            }
+            
+            if (!result.hasUppercase) {
+                recommendations.push("Afegeix lletres majúscules (A-Z)");
+            }
+            
+            if (!result.hasLowercase) {
+                recommendations.push("Afegeix lletres minúscules (a-z)");
+            }
+            
+            if (!result.hasNumbers) {
+                recommendations.push("Afegeix números (0-9)");
+            }
+            
+            if (!result.hasSymbols) {
+                recommendations.push("Afegeix símbols especials (!@#$%^&*)");
+            }
+            
+            if (result.dictionaryAttack.found) {
+                recommendations.push("⚠️ No utilitzis contrasenyes comunes o variacions simples");
+            }
+            
+            if (result.patterns.hasPatterns) {
+                recommendations.push("Evita patrons predictibles (123, *abc, *qwerty)");
+            }
+            
+            if (result.entropy < 50) {
+                recommendations.push("Augmenta la complexitat i varietat de caràcters");
+            }
+            
+            if (recommendations.length === 0) {
+                recommendations.push("✓ Contrasenya excel·lent!");
+            }
+            
+            return recommendations;
+        }
+        
+        function analyzePassword(password) {
+            const length = password.length;
+            const hasLowercase = /[a-z]/.test(password);
+            const hasUppercase = /[A-Z]/.test(password);
+            const hasNumbers = /[0-9]/.test(password);
+            const hasSymbols = /[^a-zA-Z0-9]/.test(password);
+            
+            const patterns = detectPatterns(password);
+            const entropy = calculateEntropy(password);
+            const dictionaryAttack = checkDictionary(password);
+            const bruteForce = calculateBruteForceTime(password);
+            
+            const result = {
+                length: length,
+                hasLowercase: hasLowercase,
+                hasUppercase: hasUppercase,
+                hasNumbers: hasNumbers,
+                hasSymbols: hasSymbols,
+                patterns: patterns,
+                entropy: entropy,
+                dictionaryAttack: dictionaryAttack,
+                bruteForce: bruteForce
+            };
+            
+            const score = calculateScore(password, result);
+            result.score = score;
+            
+            const recommendations = generateRecommendations(password, result);
+            result.recommendations = recommendations;
+            
+            return result;
+        }
+        
+        function generatePassword(length = 16, withSymbols = true) {
+            let characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            if (withSymbols) {
+                characters += '!@#$%^&*()_+-=[]{}|;:,.<>?';
+            }
+            
+            // Asegurar que tiene de todo
+            let password = [
+                characters.charAt(Math.floor(Math.random() * 26)), // minúscula
+                characters.charAt(26 + Math.floor(Math.random() * 26)), // mayúscula
+                characters.charAt(52 + Math.floor(Math.random() * 10)), // número
+            ];
+            
+            if (withSymbols) {
+                password.push(characters.charAt(62 + Math.floor(Math.random() * (characters.length - 62)))); // símbolo
+            }
+            
+            // Rellenar el resto
+            for (let i = password.length; i < length; i++) {
+                password.push(characters.charAt(Math.floor(Math.random() * characters.length)));
+            }
+            
+            // Mezclar
+            for (let i = password.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [password[i], password[j]] = [password[j], password[i]];
+            }
+            
+            return password.join('');
+        }
+        
+        // Mostrar resultados
+        function displayResults(password, result) {
+            // Mostrar sección de resultados
+            resultSection.style.display = 'block';
+            
+            // Actualizar puntuación
+            scoreValue.textContent = `${result.score.score}/100`;
+            scoreLabel.textContent = result.score.level;
+            scoreFill.style.width = `${result.score.score}%`;
+            scoreFill.style.backgroundColor = result.score.color;
+            
+            // Actualizar características
+            featuresGrid.innerHTML = `
+                <div class="feature-item">
+                    <span class="feature-icon ${result.hasLowercase ? 'check' : 'cross'}">${result.hasLowercase ? '✓' : '✗'}</span>
+                    <span>Minúscules</span>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon ${result.hasUppercase ? 'check' : 'cross'}">${result.hasUppercase ? '✓' : '✗'}</span>
+                    <span>Majúscules</span>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon ${result.hasNumbers ? 'check' : 'cross'}">${result.hasNumbers ? '✓' : '✗'}</span>
+                    <span>Números</span>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon ${result.hasSymbols ? 'check' : 'cross'}">${result.hasSymbols ? '✓' : '✗'}</span>
+                    <span>Símbols</span>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">📏</span>
+                    <span>Longitud: ${result.length}</span>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">🔢</span>
+                    <span>Entropia: ${result.entropy.toFixed(2)} bits</span>
+                </div>
+            `;
+            
+            // Actualizar patrones
+            if (result.patterns.hasPatterns) {
+                patternsSection.style.display = 'block';
+                patternsContent.innerHTML = result.patterns.problems.map(problem => `<p>• ${problem}</p>`).join('');
+            } else {
+                patternsSection.style.display = 'none';
+            }
+            
+            // Actualizar ataque de diccionario
+            if (result.dictionaryAttack.found) {
+                dictionaryContent.innerHTML = `
+                    <p><strong>⚠️ TROBADA!</strong> (${result.dictionaryAttack.method})</p>
+                    <p>Aquesta contrasenya es pot trencar immediatament.</p>
+                `;
+            } else {
+                dictionaryContent.innerHTML = `
+                    <p>✓ No trobada en el diccionari de contrasenyes comunes.</p>
+                `;
+            }
+            
+            // Actualizar fuerza bruta
+        bruteforceContent.innerHTML = `
+            <p><strong>Combinacions possibles:</strong> ${result.bruteForce.combinations.toLocaleString()}</p>
+            <p><strong>Temps estimat per a trencar-la:</strong></p>
+            <div>
+                ${Object.entries(result.bruteForce.estimatedTime).map(([device, time]) => 
+                    `<div style="margin-bottom: 8px;"><strong>${device}:</strong> ${time}</div>`
+                ).join('')}
+            </div>
+        `;
+
+            
+            // Actualizar recomendaciones
+            recommendationsList.innerHTML = result.recommendations.map(rec => `<li>${rec}</li>`).join('');
+            
+            // Desplazar a la sección de resultados
+            resultSection.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Event Listeners
+        analyzeBtn.addEventListener('click', function() {
+            const password = passwordInput.value;
+            
+            if (!password) {
+                alert('Si us plau, introdueix una contrasenya per a analitzar.');
+                return;
+            }
+            
+            const result = analyzePassword(password);
+            displayResults(password, result);
+        });
+        
+        generateBtn.addEventListener('click', function() {
+            const length = parseInt(document.getElementById('password-length').value) || 16;
+            const withSymbols = document.getElementById('include-symbols').value === 'yes';
+            
+            const password = generatePassword(length, withSymbols);
+            passwordDisplay.textContent = password;
+            generatedPasswordSection.style.display = 'block';
+            
+            // Desplazar a la sección de contraseña generada
+            generatedPasswordSection.scrollIntoView({ behavior: 'smooth' });
+        });
+        
+        copyBtn.addEventListener('click', function() {
+            const password = passwordDisplay.textContent;
+            navigator.clipboard.writeText(password).then(function() {
+                copyBtn.textContent = 'Copiada.';
+                setTimeout(() => {
+                    copyBtn.textContent = 'Copiar contrasenya';
+                }, 2000);
+            });
+        });
+        
+        // Navegación por pestañas
+        tabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                const tabId = this.getAttribute('data-tab');
+                
+                // Actualizar pestañas activas
+                tabs.forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Actualizar contenido activo
+                tabContents.forEach(content => content.classList.remove('active'));
+                document.getElementById(`${tabId}-tab`).classList.add('active');
+                
+                // Limpiar resultados si cambiamos a la pestaña de generar
+                if (tabId === 'generate') {
+                    resultSection.style.display = 'none';
+                    generatedPasswordSection.style.display = 'none';
+                }
+            });
+        });
+        
+        // Permitir analizar con Enter
+        passwordInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                analyzeBtn.click();
+            }
+        });
+
+    </script>
+</body>
+</html>
