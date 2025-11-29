@@ -418,26 +418,55 @@
         const copyBtn = document.getElementById('copy-btn');
         
         // Lista de contraseñas comunes
-        const commonPasswords = [
-            "123456", "password", "12345678", "qwerty", "123456789",
-            "12345", "1234", "111111", "1234567", "dragon",
-            "123123", "baseball", "iloveyou", "trustno1", "1234567890",
-            "superman", "qwertyuiop", "1q2w3e4r", "admin", "welcome",
-            "monkey", "login", "abc123", "starwars", "123qwe",
-            "football", "master", "666666", "shadow", "michael",
-            "jennifer", "111111", "jordan", "qwerty123", "123321",
-            "password1", "654321", "letmein", "sunshine", "princess",
-            "solo", "ashley", "bailey", "passw0rd", "shadow",
-            "123456a", "password123", "qwerty1", "secret", "Password1",
-            "hola123", "futbol", "basket", "banana", "chocolate",
-            "amor", "familia", "contraseña", "bienvenido", "usuario",
-            "admin123", "root", "toor", "pass", "test",
-            "guest", "info", "adm", "mysql", "user",
-            "administrator", "oracle", "ftp", "pi", "puppet",
-            "ansible", "ec2-user", "vagrant", "azureuser", "demo",
-            "minecraft", "cookie", "naruto", "pokemon", "tigger",
-            "rosebud", "killer", "batman", "trustno1", "thomas"
-        ];
+    const commonPasswords = [
+        // Numéricas simples
+        "123456","123456789","12345","1234","111111","000000","222222","333333","444444","555555",
+        "666666","777777","888888","999999","121212","123123","112233","445566","778899","696969",
+        "654321","987654321","101010","202020","246810","135790",
+
+        // Clásicas
+        "password","passwd","passw0rd","password1","password12","password123","password321",
+        "admin","admin1","admin12","admin123","admin2023","admin2024","administrator","root","root123","toor",
+        "user","user123","user2023","user2024","guest","login","login123","test","test123","demo",
+
+        // Teclado
+        "qwerty","qwertyuiop","asdf","asdfgh","zxcvbn","zxcvbnm","1q2w3e4r","1qaz2wsx",
+        "qazwsx","123qwe","qwe123","poiuytrewq","lkjhgfdsa","mnbvcxz",
+
+        // Frases típicas
+        "iloveyou","love","love123","welcome","welcome123","hello","hello123","sunshine",
+        "letmein","trustno1","freedom","whatever","nothing","secret","secret123",
+
+        // Personas y nombres
+        "michael","jennifer","jessica","ashley","daniel","jordan","thomas","andrew","joshua",
+        "emily","samantha","amanda","cristina","alex","david","laura","martin","paula",
+
+        // Deportes y ocio
+        "football","soccer","basket","baseball","tennis","futbol","barcelona","realmadrid",
+        "messi","ronaldo","neymar","chelsea","liverpool","arsenal",
+
+        // Cultura pop
+        "superman","batman","spiderman","hulk","ironman","joker","harrypotter","starwars",
+        "pokemon","naruto","dragonball","minecraft","roblox","fortnite",
+
+        // Variantes comunes
+        "abc123","abcd1234","123abc","a1b2c3","1a2b3c",
+        "password!","password?","admin!","root!","user!",
+        "pass","pass123","pass2024","pass2025",
+
+        // Español / catalán
+        "contraseña","contrasenya","hola","hola123","adios","familia","amor","amorcito",
+        "bienvenido","usuario","clave","miclave","miclave123",
+
+        // Sistemas y tech
+        "oracle","mysql","ftp","ssh","pi","raspberry","vagrant","ansible","docker","linux",
+        "ubuntu","debian","kali","windows","macos","android",
+
+        // Otros comunes
+        "cookie","chocolate","banana","tigger","monkey","dragon","killer","shadow","princess",
+        "qwerty123","adminadmin","useruser","rootroot","loginlogin"
+    ];
+
         
         // Patrones de teclado
         const keyboardPatterns = [
@@ -513,29 +542,19 @@
         
         function calculateEntropy(password) {
             let alphabetSize = 0;
+
             if (/[a-z]/.test(password)) alphabetSize += 26;
             if (/[A-Z]/.test(password)) alphabetSize += 26;
             if (/[0-9]/.test(password)) alphabetSize += 10;
             if (/[^a-zA-Z0-9]/.test(password)) alphabetSize += 32;
-            
+
             if (alphabetSize === 0) return 0;
-            
-            // Entropía = log2(alfabeto^longitud)
-            let entropy = password.length * Math.log2(alphabetSize);
-            
-            // Penalización por caracteres repetidos
-            const charCount = {};
-            for (const char of password) {
-                charCount[char] = (charCount[char] || 0) + 1;
-            }
-            
-            const maxCount = Math.max(...Object.values(charCount));
-            if (maxCount > password.length * 0.3) {
-                entropy *= 0.7; // Reducir entropía si hay muchos caracteres repetidos
-            }
-            
-            return entropy;
+
+            // ENTROPIA TEÓRICA PURA
+            return password.length * Math.log2(alphabetSize);
         }
+
+
         
         function checkDictionary(password) {
             const startTime = performance.now();
